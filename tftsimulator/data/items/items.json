@@ -1,0 +1,116 @@
+{
+    "ITEM_001": {
+        "name": "Giant's Belt",
+        "category": "component",
+        "stats": {
+            "hp": 200
+        },
+        "effects": [],
+        "description": "Increases maximum health",
+        "components": [],
+        "is_unique": false
+    },
+    "ITEM_002": {
+        "name": "B.F. Sword",
+        "category": "component",
+        "stats": {
+            "ad": 20
+        },
+        "effects": [],
+        "description": "Increases attack damage",
+        "components": [],
+        "is_unique": false
+    },
+    "ITEM_003": {
+        "name": "Sparring Gloves",
+        "category": "component",
+        "stats": {
+            "crit_chance": 25
+        },
+        "effects": [],
+        "description": "Increases critical strike chance",
+        "components": [],
+        "is_unique": false
+    },
+    "ITEM_004": {
+        "name": "Chain Vest",
+        "category": "component",
+        "stats": {
+            "armor": 25
+        },
+        "effects": [],
+        "description": "Increases armor",
+        "components": [],
+        "is_unique": false
+    },
+    "ITEM_005": {
+        "name": "Negatron Cloak",
+        "category": "component",
+        "stats": {
+            "magic_resist": 25
+        },
+        "effects": [],
+        "description": "Increases magic resistance",
+        "components": [],
+        "is_unique": false
+    },
+    "ITEM_006": {
+        "name": "Recurve Bow",
+        "category": "component",
+        "stats": {
+            "attack_speed": 15
+        },
+        "effects": [],
+        "description": "Increases attack speed",
+        "components": [],
+        "is_unique": false
+    },
+    "ITEM_007": {
+        "name": "Warmog's Armor",
+        "category": "completed_item",
+        "stats": {
+            "hp": 400,
+            "hp_percent": 10
+        },
+        "effects": [],
+        "description": "Greatly increases maximum health",
+        "components": ["ITEM_001", "ITEM_001"],
+        "is_unique": true
+    },
+    "ITEM_008": {
+        "name": "Deathblade",
+        "category": "completed_item",
+        "stats": {
+            "ad": 50,
+            "crit_chance": 20
+        },
+        "effects": [],
+        "description": "Increases attack damage and critical strike chance",
+        "components": ["ITEM_002", "ITEM_002"],
+        "is_unique": true
+    },
+    "ITEM_009": {
+        "name": "Bloodthirster",
+        "category": "completed_item",
+        "stats": {
+            "ad": 25,
+            "omnivamp": 20
+        },
+        "effects": [],
+        "description": "Grants lifesteal based on damage dealt",
+        "components": ["ITEM_002", "ITEM_005"],
+        "is_unique": true
+    },
+    "ITEM_010": {
+        "name": "Guardian Angel",
+        "category": "completed_item",
+        "stats": {
+            "armor": 40,
+            "durability": 10
+        },
+        "effects": [],
+        "description": "Increases armor and grants damage reduction",
+        "components": ["ITEM_004", "ITEM_004"],
+        "is_unique": true
+    }
+}
