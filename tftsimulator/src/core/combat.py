@@ -1,6 +1,5 @@
 from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass
-import time
 import math
 from .unit import Unit
 from enum import Enum
@@ -37,6 +36,10 @@ class Team:
         return len(self.units) == 0
 
     def get_closest_enemy(self, unit_pos: Position, enemy_team: 'Team') -> tuple[Optional[Position], Optional[Unit]]:
+        """Find the closest enemy unit. Optimized to return early when possible."""
+        if not enemy_team.units:
+            return None, None
+        
         closest_distance = float('inf')
         closest_enemy = None
         closest_pos = None
@@ -47,6 +50,9 @@ class Team:
                 closest_distance = distance
                 closest_enemy = enemy_unit
                 closest_pos = enemy_pos
+                # Early exit optimization: if distance is 1, we found the closest possible
+                if distance == 1:
+                    break
 
         return closest_pos, closest_enemy
 
@@ -59,6 +65,7 @@ class Combat:
         self.last_attack_times: Dict[Unit, float] = {}
         self.movement_states: Dict[Unit, Tuple[MovementState, float, Position, Position]] = {}
         self.movement_duration = 0.3  # Time in seconds to move between adjacent hexes
+        self.tick_rate = 0.05  # Simulation tick rate in seconds (20 ticks per second)
 
     def add_unit(self, unit: Unit, position: Position, team_id: int):
         team = self.team1 if team_id == 1 else self.team2
@@ -155,15 +162,10 @@ class Combat:
 
 
     def simulate_combat(self) -> Optional[int]:
-        start_time = time.time()
+        """Simulate combat using tick-based system for better performance"""
+        current_time = 0.0
         
-        while True:
-            current_time = time.time() - start_time
-
-            # Check time limit
-            if current_time >= self.combat_time:
-                return None  # Draw
-
+        while current_time < self.combat_time:
             # Update unit positions for moving units
             for unit in list(self.movement_states.keys()):
                 new_pos = self.update_unit_position(unit, current_time)
@@ -174,14 +176,12 @@ class Combat:
                     team.units.pop(old_pos)
                     team.units[new_pos] = unit
 
-            # Process team 1
-            team1_units = dict(self.team1.units)  # Create copy to avoid modification during iteration
-            for unit_pos, unit in team1_units.items():
+            # Process team 1 - avoid creating dict copy by using list of items
+            for unit_pos, unit in list(self.team1.units.items()):
                 self.process_unit_combat(unit, unit_pos, self.team1, self.team2, current_time)
 
-            # Process team 2
-            team2_units = dict(self.team2.units)  # Create copy to avoid modification during iteration
-            for unit_pos, unit in team2_units.items():
+            # Process team 2 - avoid creating dict copy by using list of items
+            for unit_pos, unit in list(self.team2.units.items()):
                 self.process_unit_combat(unit, unit_pos, self.team2, self.team1, current_time)
 
             # Check win conditions
@@ -189,3 +189,8 @@ class Combat:
                 return 1  # Team 1 wins
             if self.team1.is_defeated():
                 return 2  # Team 2 wins
+            
+            # Advance simulation by one tick
+            current_time += self.tick_rate
+        
+        return None  # Draw if time runs out

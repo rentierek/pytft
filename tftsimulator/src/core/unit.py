@@ -11,6 +11,9 @@ class DamageType(Enum):
     MAGICAL = "magical"
     TRUE = "true"
 
+# Cache for unit data to avoid repeated file I/O
+_UNIT_DATA_CACHE: Optional[Dict] = None
+
 @dataclass
 class UnitStats:
     health: float
@@ -37,11 +40,17 @@ class Unit:
         self._load_unit_data()
 
     def _load_unit_data(self):
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        json_path = os.path.join(current_dir, '..', '..', 'data', 'units', 'units.json')
+        global _UNIT_DATA_CACHE
         
-        with open(json_path, 'r') as f:
-            units_data = json.load(f)
+        # Load unit data from cache or file
+        if _UNIT_DATA_CACHE is None:
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            json_path = os.path.join(current_dir, '..', '..', 'data', 'units', 'units.json')
+            
+            with open(json_path, 'r') as f:
+                _UNIT_DATA_CACHE = json.load(f)
+        
+        units_data = _UNIT_DATA_CACHE
             
         if self.unit_id not in units_data:
             raise ValueError(f"Unit ID {self.unit_id} not found in units data")
