@@ -66,11 +66,14 @@ class Combat:
         self.movement_states: Dict[Unit, Tuple[MovementState, float, Position, Position]] = {}
         self.movement_duration = 0.3  # Time in seconds to move between adjacent hexes
         self.tick_rate = 0.05  # Simulation tick rate in seconds (20 ticks per second)
+        # Maintain reverse mapping for O(1) position lookups
+        self.unit_positions: Dict[Unit, Position] = {}
 
     def add_unit(self, unit: Unit, position: Position, team_id: int):
         team = self.team1 if team_id == 1 else self.team2
         team.add_unit(unit, position)
         self.last_attack_times[unit] = 0
+        self.unit_positions[unit] = position
 
     def is_overtime(self, current_time: float) -> bool:
         return current_time >= self.overtime_threshold
@@ -127,9 +130,10 @@ class Combat:
             
             # Start movement if possible
             if self.start_movement(unit, unit_pos, new_pos, current_time):
-                # Update unit position in team
+                # Update unit position in team and position mapping
                 current_team.units.pop(unit_pos)
                 current_team.units[new_pos] = unit
+                self.unit_positions[unit] = new_pos
                 # Print movement information
                 print(f"[{current_time:.1f}s] {unit.name} moving from ({unit_pos.x},{unit_pos.y}) to ({new_pos.x},{new_pos.y})")
             return
@@ -158,6 +162,9 @@ class Combat:
         # Remove dead units and announce death
         if enemy.current_health <= 0:
             enemy_team.units.pop(enemy_pos)
+            # Remove from position mapping as well
+            if enemy in self.unit_positions:
+                del self.unit_positions[enemy]
             print(f"    {enemy.name} has been defeated!")
 
 
@@ -170,11 +177,12 @@ class Combat:
             for unit in list(self.movement_states.keys()):
                 new_pos = self.update_unit_position(unit, current_time)
                 if new_pos:
-                    # Update unit position in the correct team
+                    # Update unit position using cached position mapping
                     team = self.team1 if unit in self.team1.units.values() else self.team2
-                    old_pos = next(pos for pos, u in team.units.items() if u == unit)
+                    old_pos = self.unit_positions[unit]  # O(1) lookup instead of iteration
                     team.units.pop(old_pos)
                     team.units[new_pos] = unit
+                    self.unit_positions[unit] = new_pos
 
             # Process team 1 - avoid creating dict copy by using list of items
             for unit_pos, unit in list(self.team1.units.items()):
