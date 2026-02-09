@@ -12,6 +12,7 @@ class DamageType(Enum):
     TRUE = "true"
 
 # Cache for unit data to avoid repeated file I/O
+# Note: This cache is not thread-safe. The simulator is designed for single-threaded use.
 _UNIT_DATA_CACHE: Optional[Dict] = None
 
 @dataclass

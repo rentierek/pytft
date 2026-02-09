@@ -50,7 +50,8 @@ class Team:
                 closest_distance = distance
                 closest_enemy = enemy_unit
                 closest_pos = enemy_pos
-                # Early exit optimization: if distance is 1, we found the closest possible
+                # Early exit optimization: distance uses Manhattan distance (abs(dx) + abs(dy))
+                # so the minimum possible distance between different positions is 1
                 if distance == 1:
                     break
 
@@ -184,11 +185,11 @@ class Combat:
                     team.units[new_pos] = unit
                     self.unit_positions[unit] = new_pos
 
-            # Process team 1 - avoid creating dict copy by using list of items
+            # Process team 1 - collect units to process to avoid modification during iteration
             for unit_pos, unit in list(self.team1.units.items()):
                 self.process_unit_combat(unit, unit_pos, self.team1, self.team2, current_time)
 
-            # Process team 2 - avoid creating dict copy by using list of items
+            # Process team 2 - collect units to process to avoid modification during iteration
             for unit_pos, unit in list(self.team2.units.items()):
                 self.process_unit_combat(unit, unit_pos, self.team2, self.team1, current_time)
 
